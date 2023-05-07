@@ -5,32 +5,21 @@ using UnityEngine.UI;
 
 public class DiceThrower : MonoBehaviour
 {
-    [SerializeField] private Dice dice;
-    [SerializeField] private Text diceResultText;
-    [SerializeField] private Vector3 lauchVelocity;
+    [SerializeField] private Die _die;
+    [SerializeField] private Vector3 _lauchVelocity;
 
     private void Awake()
     {
-        dice = GameObject.Instantiate(dice);
-        dice.gameObject.SetActive(false);
+        _die = GameObject.Instantiate(_die);
+        _die.gameObject.SetActive(false);
     }
 
-    public void Throw(System.Action<int> callback)
+    public void RollDie(System.Action<int> callback)
     {
-        dice.transform.position = transform.position;
-        dice.transform.rotation = Random.rotation;
-        dice.gameObject.SetActive(true);
-        dice.EvaluateWhenStopped(callback);
-    }
-
-    public void ShowResult(int result)
-    {
-        diceResultText.text = $"{result}";
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-            Throw(ShowResult);
+        _die.transform.position = transform.position;
+        _die.transform.rotation = Random.rotation;
+        _die.Rigidbody.AddForce(_lauchVelocity, ForceMode.VelocityChange);
+        _die.gameObject.SetActive(true);
+        _die.EvaluateWhenStopped(callback);
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dice : MonoBehaviour
+public class Die : MonoBehaviour
 {
     [System.Serializable]
     public struct DiceFace

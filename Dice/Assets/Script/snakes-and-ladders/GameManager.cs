@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SnakesAndLadders
@@ -14,7 +15,6 @@ namespace SnakesAndLadders
         [Min(0.0001f)] public float _pauseHopTime = 0.1f;
 
         public Board _board;
-
         private int _playerCounter = 0;
 
         private void Awake()
@@ -26,6 +26,7 @@ namespace SnakesAndLadders
             for (int i = 0; i < _players.Length; i++)
             {
                 _players[i].placeOnBoard = 1;
+                _players[i].transform.position = _board.TilePosition(0, 0);
             }
         }
 
@@ -46,16 +47,16 @@ namespace SnakesAndLadders
             int placeOnBoard = _players[_playerCounter].placeOnBoard;
             Player currentPlayer = _players[_playerCounter];
             Transform playerTr = currentPlayer.transform;
-            int newPlace = placeOnBoard + dieResult;
-            newPlace = Mathf.Min(newPlace, _rows * _collums);
+            int placeAfterRoll = placeOnBoard + dieResult;
+            placeAfterRoll = Mathf.Min(placeAfterRoll, _rows * _collums);
+            int newPlace = placeAfterRoll;
+            currentPlayer.placeOnBoard = newPlace;
 
-            for (int i = placeOnBoard; i < newPlace; i++)
+            for (int i = placeOnBoard; i < placeAfterRoll; i++)
             {
                 float elapsed = 0;
                 Vector3 previousPosition = currentPlayer.transform.position;
-                int x = i % _rows;
-                int y = i / _collums;
-                Vector3 nextPosition = _board.TilePosition(x, y);
+                Vector3 nextPosition = _board.TilePosition(i);
 
                 while (elapsed < _hopTime)
                 {
@@ -68,7 +69,6 @@ namespace SnakesAndLadders
                 yield return new WaitForSeconds(_pauseHopTime);
             }
 
-            currentPlayer.placeOnBoard = newPlace;
             yield break;
         }
 

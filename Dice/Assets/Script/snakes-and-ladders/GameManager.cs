@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SnakesAndLadders
@@ -10,69 +11,103 @@ namespace SnakesAndLadders
         public DiceThrower _diceThrower;
         public Player[] _players;
         public int _rows;
-        public int _collums;
+        public int _collumns;
         [Min(0.0001f)] public float _hopTime = 0.4f;
         [Min(0.0001f)] public float _pauseHopTime = 0.1f;
 
         public Board _board;
         private int _playerCounter = 0;
+        public Vector2Int[] _snakes;
+        public Vector2Int[] _ladders;
+
+        private Dictionary<int, int> _snakesDict = new Dictionary<int, int>();
+        private Dictionary<int, int> _laddersDict = new Dictionary<int, int>();
 
         private void Awake()
         {
             _board = GetComponent<Board>();
             _board._rows = _rows;
-            _board._collums = _collums;
+            _board._columns = _collumns;
 
             for (int i = 0; i < _players.Length; i++)
             {
                 _players[i].placeOnBoard = 1;
-                _players[i].transform.position = _board.TilePosition(0, 0);
+                _players[i].transform.position = _board.TilePosition(_players[i].placeOnBoard);
+            }
+
+            for (int i = 0; i < _snakes.Length; i++)
+            {
+                _snakesDict.Add(_snakes[i].x, _snakes[i].y);
+            }
+
+            for (int i = 0; i < _ladders.Length; i++)
+            {
+                _laddersDict.Add(_ladders[i].x, _ladders[i].y);
             }
         }
 
         public void RollDice()
         {
-            void RunMovePiece(int dieResult)
-            {
-                StartCoroutine(MovePiece(dieResult));
-            }
-
-            _diceThrower.RollDie(RunMovePiece);
-            GetNextPlayer(1);
+            _diceThrower.RollDie(MovePieceAsync);
+            CyclePlayerTurn(1);
         }
 
-        private IEnumerator MovePiece(int dieResult)
+        private async void MovePieceAsync(int dieResult)
         {
-            float stepTime = 1f / _hopTime;
             int placeOnBoard = _players[_playerCounter].placeOnBoard;
             Player currentPlayer = _players[_playerCounter];
             Transform playerTr = currentPlayer.transform;
             int placeAfterRoll = placeOnBoard + dieResult;
-            placeAfterRoll = Mathf.Min(placeAfterRoll, _rows * _collums);
+            placeAfterRoll = Mathf.Min(placeAfterRoll, _rows * _collumns);
             int newPlace = placeAfterRoll;
-            currentPlayer.placeOnBoard = newPlace;
 
-            for (int i = placeOnBoard; i < placeAfterRoll; i++)
+            for (int i = placeOnBoard; i <= placeAfterRoll; i++)
             {
-                float elapsed = 0;
-                Vector3 previousPosition = currentPlayer.transform.position;
                 Vector3 nextPosition = _board.TilePosition(i);
-
-                while (elapsed < _hopTime)
-                {
-                    playerTr.position = Vector3.Lerp(previousPosition, nextPosition, elapsed / _hopTime);
-                    elapsed += Time.deltaTime * stepTime;
-                    yield return null;
-                }
-
-                playerTr.position = nextPosition;
-                yield return new WaitForSeconds(_pauseHopTime);
+                await MoveTransformAsync(playerTr, nextPosition, _hopTime);
+                await DelayForSecounds(_pauseHopTime);
             }
 
-            yield break;
+            if (_snakesDict.ContainsKey(placeAfterRoll))
+            {
+                newPlace = _snakesDict[placeAfterRoll];
+                Vector3 nextPosition = _board.TilePosition(newPlace);
+                await MoveTransformAsync(playerTr, nextPosition, _hopTime);
+                await DelayForSecounds(_pauseHopTime);
+            }
+
+            if (_laddersDict.ContainsKey(placeAfterRoll))
+            {
+                newPlace = _laddersDict[placeAfterRoll];
+                Vector3 nextPosition = _board.TilePosition(newPlace);
+                await MoveTransformAsync(playerTr, nextPosition, _hopTime);
+                await DelayForSecounds(_pauseHopTime);
+            }
+
+            currentPlayer.placeOnBoard = newPlace;
         }
 
-        public Player GetNextPlayer(int turns = 1)
+        public async Task MoveTransformAsync(Transform transform, Vector3 newPosition, float travelTime)
+        {
+            float elapsed = 0;
+            Vector3 previousPosition = transform.position;
+
+            while (elapsed < travelTime)
+            {
+                transform.position = Vector3.Lerp(previousPosition, newPosition, elapsed / travelTime);
+                elapsed += Time.deltaTime;
+                await Task.Yield();
+            }
+
+            transform.position = newPosition;
+        }
+
+        public async Task DelayForSecounds(float secounds)
+        {
+            await Task.Delay(Mathf.RoundToInt(secounds * 1000));
+        }
+
+        public Player CyclePlayerTurn(int turns = 1)
         {
             _playerCounter = (_playerCounter + turns) % _players.Length;
             return _players[_playerCounter];

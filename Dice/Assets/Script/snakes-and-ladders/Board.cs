@@ -9,24 +9,26 @@ namespace SnakesAndLadders
     {
         public Vector3 _offset;
         public int _rows;
-        public int _collums;
+        public int _columns;
         public float _tileWidth;
         public float _tileHeight;
 
-        public Vector3 TilePosition(int row, int distanceAlongColumn)
+        public Vector3 TilePosition(int distanceAlongRow, int collumn)
         {
-            float x = _tileWidth * row + (_tileWidth * 0.5f);
-            x = distanceAlongColumn % 2 == 0 ? x : _tileWidth * _rows - x;
-            Vector3 fromOrigin = new Vector3(x, 0, _tileHeight * distanceAlongColumn + (_tileHeight * 0.5f));
+            float x = _tileWidth * distanceAlongRow + (_tileWidth * 0.5f);
+            x = collumn % 2 == 0 ? x : _tileWidth * _rows - x;
+            float z = _tileHeight * collumn + (_tileHeight * 0.5f);
+            Vector3 fromOrigin = new Vector3(x, 0, z);
             return transform.position + _offset + fromOrigin;
         }
 
         public Vector3 TilePosition(int tile)
         {
-            int row = tile % _rows;
-            int distanceAlongColumn = tile / _rows;
+            tile--;
+            int x = tile % _rows;
+            int y = tile / _rows;
 
-            return TilePosition(row, distanceAlongColumn);
+            return TilePosition(x, y);
         }
     }
 }

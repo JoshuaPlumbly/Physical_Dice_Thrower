@@ -161,10 +161,26 @@ MonoBehaviour:
   - {fileID: 1667724540}
   - {fileID: 1293356491}
   _rows: 10
-  _collums: 10
+  _collumns: 10
   _hopTime: 0.4
   _pauseHopTime: 0.1
   _board: {fileID: 0}
+  _snakes:
+  - {x: 27, y: 8}
+  - {x: 43, y: 25}
+  - {x: 61, y: 42}
+  - {x: 67, y: 48}
+  - {x: 88, y: 57}
+  - {x: 97, y: 93}
+  - {x: 99, y: 64}
+  _ladders:
+  - {x: 2, y: 22}
+  - {x: 9, y: 31}
+  - {x: 18, y: 46}
+  - {x: 33, y: 44}
+  - {x: 51, y: 68}
+  - {x: 59, y: 78}
+  - {x: 75, y: 86}
 --- !u!65 &49170965
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -198,7 +214,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 14394b04c36b5d046a38c4c3f0738126, type: 2}
+  - {fileID: 2100000, guid: cb9fef9178f6f8d4faec5a7be41bc235, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -235,14 +251,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 49170963}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 20, y: 0.1, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &49170969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,7 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _offset: {x: -10, y: 0, z: -10}
   _rows: 0
-  _collums: 11
+  _columns: 0
   _tileWidth: 2
   _tileHeight: 2
 --- !u!1 &263704644

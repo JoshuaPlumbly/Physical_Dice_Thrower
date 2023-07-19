@@ -49,7 +49,7 @@ namespace SnakesAndLadders
         public void RollDice()
         {
             _diceThrower.RollDie(MovePieceAsync);
-            CyclePlayerTurn(1);
+            CyclePlayerTurn();
         }
 
         private async void MovePieceAsync(int dieResult)
@@ -107,10 +107,30 @@ namespace SnakesAndLadders
             await Task.Delay(Mathf.RoundToInt(secounds * 1000));
         }
 
-        public Player CyclePlayerTurn(int turns = 1)
+        public Player CyclePlayerTurn()
         {
-            _playerCounter = (_playerCounter + turns) % _players.Length;
-            return _players[_playerCounter];
+            for (int i = 0; i < _players.Length; i++)
+            {
+                _playerCounter = (_playerCounter + 1) % _players.Length;
+
+                if (!IsAtEndOfBoard(_players[_playerCounter]))
+                {
+                    return _players[_playerCounter];
+                }
+            }
+
+            Debug.Log("No available players that can move!");
+            return null;
+        }
+
+        public int TotalTiles()
+        {
+            return _rows * _collumns;
+        }
+
+        public bool IsAtEndOfBoard(Player player)
+        {
+            return player.placeOnBoard == TotalTiles();
         }
     }
 }

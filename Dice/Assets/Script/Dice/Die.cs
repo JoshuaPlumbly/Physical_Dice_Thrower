@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace Plumbly.Dice
 {
+    [System.Serializable]
+    public struct DiceFace<T>
+    {
+        public Vector3 DotVector;
+        public T FaceValue;
+    }
+
     public class Die : RigidbodyProjectile
     {
-        [System.Serializable]
-        public struct DiceFace
-        {
-            public Vector3 DotVector;
-            public int FaceValue;
-        }
-
-        [SerializeField] private DiceFace[] _faces;
+        [SerializeField] private DiceFace<int>[] _faces;
 
         private int Evaluate()
         {

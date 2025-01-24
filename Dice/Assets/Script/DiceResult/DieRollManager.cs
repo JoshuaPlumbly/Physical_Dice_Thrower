@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class DieRollManager : MonoBehaviour
 {
-    public DiceThrower _diceThrower;
+    public DieCaster _diceThrower;
     public CoinThrower _coinThrower;
     public Text _text;
 
@@ -16,7 +16,7 @@ public class DieRollManager : MonoBehaviour
         }
 
         _text.text = "";
-        _diceThrower.RollDie(ShowResult);
+        _diceThrower.CastNewDie(ShowResult);
     }
 
     public void FlipCoint()

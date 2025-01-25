@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using Plumbly.Dice;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,7 +8,7 @@ namespace SnakesAndLadders
     [RequireComponent(typeof(Board))]
     public class GameManager : MonoBehaviour
     {
-        public DiceThrower _diceThrower;
+        public DieCaster _dieCaster;
         public Player[] _players;
         public int _rows;
         public int _collumns;
@@ -48,7 +48,7 @@ namespace SnakesAndLadders
 
         public void RollDice()
         {
-            _diceThrower.RollDie(MovePieceAsync);
+            _dieCaster.CastDie(MovePieceAsync);
             CyclePlayerTurn();
         }
 

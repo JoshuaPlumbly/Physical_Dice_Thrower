@@ -1,8 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPooler
+public class ObjectPoolManager
 {
     public static Dictionary<string, Component> _poolLookup = new Dictionary<string, Component>();
     public static Dictionary<string, Queue<Component>> _poolDictionary = new Dictionary<string, Queue<Component>>();

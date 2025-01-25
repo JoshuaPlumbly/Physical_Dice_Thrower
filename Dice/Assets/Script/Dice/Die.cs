@@ -1,20 +1,82 @@
+﻿using System;
 using System.Collections;
 using UnityEngine;
 
 namespace Plumbly.Dice
 {
-    [System.Serializable]
-    public struct DiceFace<T>
+    public class Die<T> : PoolableObject, IDie<T>
     {
-        public Vector3 DotVector;
-        public T FaceValue;
-    }
+        [SerializeField] private DiceFace<T>[] _faces;
+        [SerializeField] private float _waitTimeForDieToStop = 1f;
 
-    public class Die : RigidbodyProjectile
-    {
-        [SerializeField] private DiceFace<int>[] _faces;
+        private Rigidbody _rigidbody;
+        private ObjectPool _pool;
 
-        private int Evaluate()
+        private void Awake()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+            DieRollManager.DespawnSpawnedAssets += Despawn;
+        }
+
+        private void OnDestroy()
+        {
+            DieRollManager.DespawnSpawnedAssets -= Despawn;
+        }
+
+        public override void AssignToPool(ObjectPool objectPool)
+        {
+            _pool = objectPool;
+        }
+
+        private void Despawn()
+        {
+            if (_pool != null)
+            {
+                _pool.EnqueueObject(this);
+                return;
+            }
+
+            GameObject.Destroy(gameObject);
+        }
+
+        public void Cast(Vector3 launchVelocity, Action<T> callback)
+        {
+            _rigidbody.AddForce(launchVelocity, ForceMode.VelocityChange);
+            transform.rotation = UnityEngine.Random.rotation;
+            StartCoroutine(CastCoroutine(callback));
+        }
+
+        public IEnumerator CastCoroutine(Action<T> callback)
+        {
+            Vector3 oldPosition = transform.position;
+            Quaternion oldRotation = transform.rotation;
+            float timeStillFor = 0f;
+            bool isFinishedMoving = false;
+
+            while (!isFinishedMoving)
+            {
+                if (Vector3.Distance(oldPosition, transform.position) < 0.01f && Quaternion.Angle(transform.rotation, oldRotation) < 0.01f)
+                {
+                    timeStillFor += Time.deltaTime;
+
+                    if (timeStillFor >= _waitTimeForDieToStop)
+                    {
+                        callback(GetUpwardsFace());
+                        isFinishedMoving = true;
+                    }
+                }
+                else
+                {
+                    timeStillFor = 0f;
+                }
+
+                oldPosition = transform.position;
+                oldRotation = transform.rotation;
+                yield return null;
+            }
+        }
+
+        private T GetUpwardsFace()
         {
             var bestDot = -1f;
             var bestFaceIndex = 0;
@@ -33,56 +95,6 @@ namespace Plumbly.Dice
             }
 
             return _faces[bestFaceIndex].FaceValue;
-        }
-
-        public bool EvaluateWhenStopped(System.Action<int> callback, float waitTimeForDiceToStop)
-        {
-            if (!enabled)
-                return false;
-
-            StartCoroutine(EvaluateWhenStoppedCoroutine(callback, waitTimeForDiceToStop));
-            return true;
-        }
-
-        public IEnumerator EvaluateWhenStoppedCoroutine(System.Action<int> callback, float waitTimeForDiceToStop)
-        {
-            var oldPosition = transform.position;
-            var oldRotation = transform.rotation;
-            var stillFor = 0f;
-            var finished = false;
-
-            while (!finished)
-            {
-                if (Vector3.Distance(oldPosition, transform.position) < 0.01f && Quaternion.Angle(transform.rotation, oldRotation) < 0.01f)
-                {
-                    stillFor += Time.deltaTime;
-
-                    if (stillFor >= waitTimeForDiceToStop)
-                    {
-                        callback(Evaluate());
-                        finished = true;
-                    }
-                }
-                else
-                {
-                    stillFor = 0f;
-                }
-
-                oldPosition = transform.position;
-                oldRotation = transform.rotation;
-                yield return null;
-            }
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-
-            for (int i = 0; i < _faces.Length; i++)
-            {
-                var worldSpace = transform.localToWorldMatrix.MultiplyVector(_faces[i].DotVector);
-                Gizmos.DrawLine(transform.position, transform.position + worldSpace);
-            }
         }
     }
 }

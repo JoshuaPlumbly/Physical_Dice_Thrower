@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,53 +11,89 @@ namespace Plumbly.Dice
         Edge
     }
 
-    public class Coin : RigidbodyProjectile
+    public class Coin : PoolableObject, IDie<SideOfCoin>
     {
-        public SideOfCoin Evaluate(float edgeAngleRev = 0)
-        {
-            var dot = Vector3.Dot(transform.up, Vector3.up);
+        [SerializeField] private float _edgeAngle;
+        [SerializeField] private float _waitTimeForDieToStop = 1f;
 
-            if (dot > edgeAngleRev)
-                return SideOfCoin.Upside;
-            else if (dot < -edgeAngleRev)
-                return SideOfCoin.Downside;
-            else
-                return SideOfCoin.Edge;
+        private Rigidbody _rigidbody;
+        private ObjectPool _pool;
+
+
+        private void Awake()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+            DieRollManager.DespawnSpawnedAssets += Despawn;
         }
 
-        public void EvaluateWhenStopped(System.Action<SideOfCoin> callback, float waitTimeForDiceToStop)
+        private void OnDestroy()
         {
-            StartCoroutine(EvaluateWhenStoppedCoroutine(callback, waitTimeForDiceToStop));
+            DieRollManager.DespawnSpawnedAssets -= Despawn;
         }
 
-        public IEnumerator EvaluateWhenStoppedCoroutine(System.Action<SideOfCoin> callback, float waitTimeForDiceToStop)
+        public override void AssignToPool(ObjectPool objectPool)
         {
-            var oldPosition = transform.position;
-            var oldRotation = transform.rotation;
-            var stillFor = 0f;
-            var finished = false;
+            _pool = objectPool;
+        }
 
-            while (!finished)
+        private void Despawn()
+        {
+            if (_pool != null)
+            {
+                _pool.EnqueueObject(this);
+                return;
+            }
+
+            GameObject.Destroy(gameObject);
+        }
+
+        public void Cast(Vector3 launchVelocity, Action<SideOfCoin> callback)
+        {
+            _rigidbody.AddForce(launchVelocity, ForceMode.VelocityChange);
+            transform.rotation = UnityEngine.Random.rotation;
+            StartCoroutine(CastCoroutine(callback));
+        }
+
+        public IEnumerator CastCoroutine(Action<SideOfCoin> callback)
+        {
+            Vector3 oldPosition = transform.position;
+            Quaternion oldRotation = transform.rotation;
+            float timeStillFor = 0f;
+            bool isFinishedMoving = false;
+
+            while (!isFinishedMoving)
             {
                 if (Vector3.Distance(oldPosition, transform.position) < 0.01f && Quaternion.Angle(transform.rotation, oldRotation) < 0.01f)
                 {
-                    stillFor += Time.deltaTime;
+                    timeStillFor += Time.deltaTime;
 
-                    if (stillFor >= waitTimeForDiceToStop)
+                    if (timeStillFor >= _waitTimeForDieToStop)
                     {
-                        callback(Evaluate());
-                        finished = true;
+                        callback(GetUpwardsFace());
+                        isFinishedMoving = true;
                     }
                 }
                 else
                 {
-                    stillFor = 0f;
+                    timeStillFor = 0f;
                 }
 
                 oldPosition = transform.position;
                 oldRotation = transform.rotation;
                 yield return null;
             }
+        }
+
+        private SideOfCoin GetUpwardsFace()
+        {
+            var dot = Vector3.Dot(transform.up, Vector3.up);
+
+            if (dot > _edgeAngle)
+                return SideOfCoin.Upside;
+            else if (dot < -_edgeAngle)
+                return SideOfCoin.Downside;
+            else
+                return SideOfCoin.Edge;
         }
     }
 }

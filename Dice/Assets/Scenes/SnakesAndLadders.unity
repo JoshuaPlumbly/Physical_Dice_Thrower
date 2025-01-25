@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8741e9d4d5eaa1b4d8aef416a3618ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dieCaster: {fileID: 0}
+  _dieCaster: {fileID: 973349260}
   _players:
   - {fileID: 1667724540}
   - {fileID: 1293356491}
@@ -336,6 +336,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SixSidedDie
       objectReference: {fileID: 0}
+    - target: {fileID: 3439866265083744259, guid: 6e06a09ba2b91b14489d8b1038adf6c8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -480,7 +484,7 @@ Transform:
   m_GameObject: {fileID: 272262774}
   serializedVersion: 2
   m_LocalRotation: {x: 0.6427876, y: 0, z: 0, w: 0.7660445}
-  m_LocalPosition: {x: -0, y: 20, z: -4}
+  m_LocalPosition: {x: -0, y: 30, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -706,7 +710,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9fbfcbfa9f4b014285d42cbba4ec582, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sixSidedDie: {fileID: 1763205143}
+  _die: {fileID: 1763205143}
   _launchVelcity: 0
 --- !u!1 &1023480046
 GameObject:

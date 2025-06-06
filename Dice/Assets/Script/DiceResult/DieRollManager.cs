@@ -5,15 +5,16 @@ using UnityEngine.UI;
 
 public class DieRollManager : MonoBehaviour
 {
+
     [SerializeField] DieInt _sixSidedDiePrefab;
     [SerializeField] Coin _coinPrefab;
     [SerializeField] float _launchVelcity;
-    [SerializeField] Text _resultText;
 
     private ObjectPool _sixSidedDie;
     private ObjectPool _coin;
 
     public static event Action DespawnSpawnedAssets;
+    public Action<string> OnResultFinished;
 
     private void Awake()
     {
@@ -41,24 +42,22 @@ public class DieRollManager : MonoBehaviour
 
     public void RollDice()
     {
-        void ShowResult(int result)
+        void Callback(int result)
         {
-            _resultText.text = result.ToString();
+            OnResultFinished?.Invoke(result.ToString());
         }
 
-        _resultText.text = "";
-        CastNewDie(ShowResult);
+        CastNewDie(Callback);
     }
 
     public void FlipCoint()
     {
-        void ShowResult(SideOfCoin result)
+        void Callback(SideOfCoin result)
         {
-            _resultText.text = result.ToString();
+            OnResultFinished?.Invoke(result.ToString());
         }
 
-        _resultText.text = "";
-        FlipNewCoin(ShowResult);
+        FlipNewCoin(Callback);
     }
 
     public void ClearAssets()

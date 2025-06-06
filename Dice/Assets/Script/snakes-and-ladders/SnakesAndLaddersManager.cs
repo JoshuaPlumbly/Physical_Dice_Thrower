@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SnakesAndLadders
 {
     [RequireComponent(typeof(Board))]
-    public class GameManager : MonoBehaviour
+    public class SnakesAndLaddersManager : MonoBehaviour
     {
         public DieCaster _dieCaster;
         public Player[] _players;

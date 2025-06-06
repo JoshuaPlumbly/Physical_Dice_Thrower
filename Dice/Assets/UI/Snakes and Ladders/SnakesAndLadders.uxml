@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Snakes%20and%20Ladders/snakes-and-ladders.uss?fileID=7433441132597879392&amp;guid=387abe78157c37440a3f0a346558ae85&amp;type=3#snakes-and-ladders" />
+    <ui:VisualElement name="root" style="flex-grow: 1;">
+        <ui:Button text="ROLL DIE" parse-escape-sequences="true" display-tooltip-when-elided="true" name="RollSixDieButton" style="bottom: 20px; right: 40px; font-size: 14px; align-self: flex-end; align-items: flex-end; position: absolute; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; width: 160px; height: 30px;" />
+    </ui:VisualElement>
+</ui:UXML>
